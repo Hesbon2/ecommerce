@@ -3,7 +3,7 @@ const User = require('../models/userModel');
 const ErrorHandler = require('../utils/errorHandler');
 const asyncErrorHandler = require('./asyncErrorHandler');
 
-exports.isAuthenticatedUser = asyncErrorHandler(async (req, res, next) => {
+/*exports.isAuthenticatedUser = asyncErrorHandler(async (req, res, next) => {
 
     const { token } = req.cookies;
 
@@ -24,4 +24,21 @@ exports.authorizeRoles = (...roles) => {
         }
         next();
     }
-}
+}*/
+
+exports.isAuthenticatedUser = asyncErrorHandler(async (req, res, next) => {
+    const { token } = req.cookies;
+
+    if (token) {
+        try {
+            const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = await User.findById(decodedData.id);
+        } catch (error) {
+            // If token invalid or expired, just ignore and continue
+            console.log("JWT Error:", error.message);
+        }
+    }
+    
+    // Continue anyway
+    next();
+});
