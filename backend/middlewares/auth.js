@@ -3,7 +3,7 @@ const User = require('../models/userModel');
 const ErrorHandler = require('../utils/errorHandler');
 const asyncErrorHandler = require('./asyncErrorHandler');
 
-/*exports.isAuthenticatedUser = asyncErrorHandler(async (req, res, next) => {
+exports.isAuthenticatedUser = asyncErrorHandler(async (req, res, next) => {
 
     const { token } = req.cookies;
 
@@ -24,40 +24,4 @@ exports.authorizeRoles = (...roles) => {
         }
         next();
     }
-}*/
-
-// Middleware to check if user is authenticated
-const isAuthenticatedUser = asyncErrorHandler(async (req, res, next) => {
-    const { token } = req.cookies;
-
-    if (token) {
-        try {
-            const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = await User.findById(decodedData.id);
-        } catch (error) {
-            // If token invalid/expired, ignore and continue
-            console.log("JWT Error:", error.message);
-        }
-    }
-    
-    // Continue whether user authenticated or not
-    next();
-});
-
-// Middleware to authorize specific roles
-const authorizeRoles = (...roles) => {
-    return (req, res, next) => {
-        // Only check if user is actually authenticated
-        if (req.user && !roles.includes(req.user.role)) {
-            return next(new ErrorHandler(`Role: ${req.user.role} is not allowed to access this resource`, 403));
-        }
-        next();
-    };
-};
-
-// Proper export
-module.exports = {
-    isAuthenticatedUser,
-    authorizeRoles
-};
-
+}
