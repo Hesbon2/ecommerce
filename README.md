@@ -1,7 +1,7 @@
-# Flipkart - MERN
-Full-Stack Flipkart with Admin Dashboard & Paytm Payment Gateway.
+# SmartHouse - MERN
+Full-Stack SmartHouse with Admin Dashboard & Paytm Payment Gateway.
 
-[Visit Now](https://flipkartweb-mern.vercel.app) 🚀
+[Visit Now](https://SmartHouseweb-mern.vercel.app) 🚀
 
 ## 🖥️ Tech Stack
 **Frontend:**
