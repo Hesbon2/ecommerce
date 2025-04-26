@@ -26,7 +26,8 @@ exports.authorizeRoles = (...roles) => {
     }
 }*/
 
-exports.isAuthenticatedUser = asyncErrorHandler(async (req, res, next) => {
+// Middleware to check if user is authenticated
+const isAuthenticatedUser = asyncErrorHandler(async (req, res, next) => {
     const { token } = req.cookies;
 
     if (token) {
@@ -34,11 +35,29 @@ exports.isAuthenticatedUser = asyncErrorHandler(async (req, res, next) => {
             const decodedData = jwt.verify(token, process.env.JWT_SECRET);
             req.user = await User.findById(decodedData.id);
         } catch (error) {
-            // If token invalid or expired, just ignore and continue
+            // If token invalid/expired, ignore and continue
             console.log("JWT Error:", error.message);
         }
     }
     
-    // Continue anyway
+    // Continue whether user authenticated or not
     next();
 });
+
+// Middleware to authorize specific roles
+const authorizeRoles = (...roles) => {
+    return (req, res, next) => {
+        // Only check if user is actually authenticated
+        if (req.user && !roles.includes(req.user.role)) {
+            return next(new ErrorHandler(`Role: ${req.user.role} is not allowed to access this resource`, 403));
+        }
+        next();
+    };
+};
+
+// Proper export
+module.exports = {
+    isAuthenticatedUser,
+    authorizeRoles
+};
+
